@@ -6,10 +6,15 @@ const App = () => {
 
   const lisaaHenkilo = (event) => {
     event.preventDefault();
+
     if (newName) {
-      const henkilo = { name: newName };
-      setPersons(persons.concat(henkilo));
-      setNewName("");
+      if (persons.some((person) => person.name === newName)) {
+        alert(`${newName} is already added to phonebook`);
+      } else {
+        const henkilo = { name: newName };
+        setPersons(persons.concat(henkilo));
+        setNewName("");
+      }
     }
   };
 
