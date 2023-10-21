@@ -6,15 +6,12 @@ import Persons from "./components/Persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [haku, setHaku] = useState("");
 
   useEffect(() => {
-    console.log("effect");
     axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("promise fulfilled");
       setPersons(response.data);
     });
   }, []);
@@ -28,23 +25,34 @@ const App = () => {
         alert(`${newName} is already added to phonebook`);
       } else {
         const henkilo = { name: newName, number: newNumber };
-        setPersons(persons.concat(henkilo));
-        setNewName("");
-        setNewNumber("");
+
+        axios
+          .post("http://localhost:3001/persons", henkilo)
+          .then((response) => {
+            console.log(response);
+            const addedPerson = response.data;
+
+            setPersons(persons.concat(addedPerson));
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((error) => {
+            console.log("fail");
+          });
       }
     }
   };
 
   const handleNameChange = (event) => {
-    console.log(event.target.value);
+    //console.log(event.target.value);
     setNewName(event.target.value);
   };
   const handleNumberChange = (event) => {
-    console.log(event.target.value);
+    //console.log(event.target.value);
     setNewNumber(event.target.value);
   };
   const handleHaeChange = (event) => {
-    console.log(event.target.value);
+    //console.log(event.target.value);
     setHaku(event.target.value);
   };
 
