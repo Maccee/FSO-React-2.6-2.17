@@ -12,19 +12,17 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [haku, setHaku] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [messageType, setMessageType] = useState("success");
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
       setPersons(initialPersons);
     });
   }, []);
-  console.log("render", persons.length, "persons");
-
+  // console.log("render", persons.length, "persons");
   const lisaaHenkilo = (event) => {
     event.preventDefault();
-
     const existingPerson = persons.find((person) => person.name === newName);
-
     if (existingPerson && existingPerson.number !== newNumber) {
       if (
         window.confirm(
@@ -40,12 +38,21 @@ const App = () => {
                 person.id !== existingPerson.id ? person : updatedPerson
               )
             );
+            setMessageType("success");
             setErrorMessage(`${updatedPerson.name} numero muutettu!`);
             setNewName("");
             setNewNumber("");
           })
           .catch((error) => {
-            console.log("fail");
+            setMessageType("error");
+            setErrorMessage(
+              `${error.message}, ${existingPerson.name} ei löydy tietokannasta!`
+            );
+            setNewName("");
+            setNewNumber("");
+            setPersons(
+              persons.filter((person) => person.id !== existingPerson.id)
+            );
           });
         setTimeout(() => {
           setErrorMessage(null);
@@ -57,11 +64,11 @@ const App = () => {
         .addPerson(henkilo)
         .then((returnedPerson) => {
           setPersons(persons.concat(returnedPerson));
+          setMessageType("success");
           setErrorMessage(`${returnedPerson.name} lisätty!`);
           setNewName("");
           setNewNumber("");
         })
-
         .catch((error) => {
           console.log("fail");
         });
@@ -77,6 +84,7 @@ const App = () => {
     if (window.confirm(`Delete ${person.name}?`)) {
       personService.deletePerson(id).then(() => {
         setPersons(persons.filter((p) => p.id !== id));
+        setMessageType("success");
         setErrorMessage(`${person.name} poistettu!`);
       });
       setTimeout(() => {
@@ -105,7 +113,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} />
+      <Notification message={errorMessage} type={messageType} />
       <Filter handleHaeChange={handleHaeChange} />
       <h3>add a new</h3>
       <PersonForm
