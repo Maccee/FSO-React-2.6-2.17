@@ -3,12 +3,15 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import personService from "./services/persons";
+import Notification from "./components/Notification";
+import "./App.css";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [haku, setHaku] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -37,12 +40,16 @@ const App = () => {
                 person.id !== existingPerson.id ? person : updatedPerson
               )
             );
+            setErrorMessage(`${updatedPerson.name} numero muutettu!`);
             setNewName("");
             setNewNumber("");
           })
           .catch((error) => {
             console.log("fail");
           });
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 3000);
       }
     } else if (!existingPerson) {
       const henkilo = { name: newName, number: newNumber };
@@ -50,12 +57,17 @@ const App = () => {
         .addPerson(henkilo)
         .then((returnedPerson) => {
           setPersons(persons.concat(returnedPerson));
+          setErrorMessage(`${returnedPerson.name} lisätty!`);
           setNewName("");
           setNewNumber("");
         })
+
         .catch((error) => {
           console.log("fail");
         });
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 3000);
     }
   };
 
@@ -65,7 +77,11 @@ const App = () => {
     if (window.confirm(`Delete ${person.name}?`)) {
       personService.deletePerson(id).then(() => {
         setPersons(persons.filter((p) => p.id !== id));
+        setErrorMessage(`${person.name} poistettu!`);
       });
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 3000);
     }
   };
 
@@ -89,6 +105,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter handleHaeChange={handleHaeChange} />
       <h3>add a new</h3>
       <PersonForm
