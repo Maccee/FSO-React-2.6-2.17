@@ -38,6 +38,15 @@ const App = () => {
       }
     }
   };
+  const poistaHenkilo = (id) => {
+    const person = persons.find((p) => p.id === id);
+
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personService.deletePerson(id).then(() => {
+        setPersons(persons.filter((p) => p.id !== id));
+      });
+    }
+  };
 
   const handleNameChange = (event) => {
     //console.log(event.target.value);
@@ -69,7 +78,7 @@ const App = () => {
         newNumber={newNumber}
       />
       <h3>Numbers</h3>
-      <Persons haettuPersons={haettuPersons} />
+      <Persons haettuPersons={haettuPersons} poistaHenkilo={poistaHenkilo} />
     </div>
   );
 };
