@@ -20,15 +20,23 @@ const App = () => {
   const lisaaHenkilo = (event) => {
     event.preventDefault();
 
-    if (newName && newNumber) {
-      if (persons.some((person) => person.name === newName)) {
-        alert(`${newName} is already added to phonebook`);
-      } else {
-        const henkilo = { name: newName, number: newNumber };
+    const existingPerson = persons.find((person) => person.name === newName);
+
+    if (existingPerson && existingPerson.number !== newNumber) {
+      if (
+        window.confirm(
+          `${newName} is already added to the phonebook, replace the old number with the new one?`
+        )
+      ) {
+        const updatedNumber = { ...existingPerson, number: newNumber };
         personService
-          .addPerson(henkilo)
-          .then((returnedPerson) => {
-            setPersons(persons.concat(returnedPerson));
+          .updateNumber(existingPerson.id, updatedNumber)
+          .then((updatedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== existingPerson.id ? person : updatedPerson
+              )
+            );
             setNewName("");
             setNewNumber("");
           })
@@ -36,8 +44,21 @@ const App = () => {
             console.log("fail");
           });
       }
+    } else if (!existingPerson) {
+      const henkilo = { name: newName, number: newNumber };
+      personService
+        .addPerson(henkilo)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((error) => {
+          console.log("fail");
+        });
     }
   };
+
   const poistaHenkilo = (id) => {
     const person = persons.find((p) => p.id === id);
 

@@ -15,4 +15,12 @@ const deletePerson = (id) => {
   return request.then((response) => response.data);
 };
 
-export default { addPerson, getAll, deletePerson };
+const updateNumber = (id, updatedNumber) => {
+  const request = axios.put(
+    `http://localhost:3001/persons/${id}`,
+    updatedNumber
+  );
+  return request.then((response) => response.data);
+};
+
+export default { addPerson, getAll, deletePerson, updateNumber };
